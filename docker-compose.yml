@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  aether-core:
+    build: .
+    container_name: aetherium_genesis_core
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python main_simulation.py
+    restart: unless-stopped
