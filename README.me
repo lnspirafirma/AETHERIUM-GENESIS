@@ -1,32 +1,20 @@
-# core/envelope.py
-from dataclasses import dataclass
-from typing import Dict, Any
-import hashlib
-import json
+This PR initializes the AETHERIUM-GENESIS project structure and core components according to the "Firma" architecture blueprint.
 
-@dataclass(frozen=True)
-class AkashicEnvelope:
-    """
-    ภาชนะบรรจุความจริงที่ไม่สามารถแก้ไขได้ (Immutable Data Carrier)
-    ใช้ Canonical Hashing เพื่อรับรองความสมบูรณ์
-    """
-    intent: str
-    payload: Dict[str, Any]
-    source_id: str
-    timestamp: float
-    
-    def calculate_hash(self) -> str:
-        """ใช้ Canonical Hashing เพื่อสร้าง Integrity Seal"""
-        canonical_data = json.dumps(
-            (self.intent, self.payload, self.source_id, self.timestamp),
-            sort_keys=True
-        ).encode('utf-8')
-        return hashlib.sha256(canonical_data).hexdigest()
-        
-    def get_integrity_seal(self) -> str:
-        """Role: ทำหน้าที่เป็น Integrity Seal"""
-        return self.calculate_hash()
+**Key Changes:**
+1.  **Project Structure:** Created `core/`, `agents/`, `config/`, and `tests/` directories.
+2.  **Core Infrastructure:**
+    *   `AetherConductor`: Async event bus with Pub/Sub and Trust Scoring/Quarantine logic.
+    *   `Envelope`: Immutable data carrier with Canonical Hashing.
+    *   `KnowledgeCentricProcessor (KCP)`: Implements "Dialectical Thinking" (Thesis -> Antithesis -> Synthesis) using a mock Graph and Vector DB.
+3.  **Agents:**
+    *   `AgioSageAgent`: Integrated with KCP to provide wisdom-based responses.
+    *   `GEPPolicyEnforcer`: Implements governance rules and audit gates.
+    *   `UposathaCleanerAgent`: Background agent for system entropy reduction (cleanup).
+4.  **Testing:**
+    *   Added `pytest` suite with `pytest-asyncio` and `pytest-cov`.
+    *   Achieved >90% code coverage across core modules.
+    *   Verified "Dialectical Thought" generation and Graph/Vector DB interactions.
 
-# ตัวอย่างการใช้งาน:
-# env = AkashicEnvelope(intent="Manifestation", payload={"action": "create_node"}, source_id="Gateway-A", timestamp=1733000000.0)
-# print(env.get_integrity_seal())
+**Fixes:**
+*   Fixed argument order mismatch in `SimpleKnowledgeGraph.add_edge` and `load_mock_data`.
+*   Fixed dependency injection order in `KnowledgeCentricProcessor`.
