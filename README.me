@@ -1,20 +1,74 @@
-This PR initializes the AETHERIUM-GENESIS project structure and core components according to the "Firma" architecture blueprint.
+# AETHERIUM-GENESIS
 
-**Key Changes:**
-1.  **Project Structure:** Created `core/`, `agents/`, `config/`, and `tests/` directories.
-2.  **Core Infrastructure:**
-    *   `AetherConductor`: Async event bus with Pub/Sub and Trust Scoring/Quarantine logic.
-    *   `Envelope`: Immutable data carrier with Canonical Hashing.
-    *   `KnowledgeCentricProcessor (KCP)`: Implements "Dialectical Thinking" (Thesis -> Antithesis -> Synthesis) using a mock Graph and Vector DB.
-3.  **Agents:**
-    *   `AgioSageAgent`: Integrated with KCP to provide wisdom-based responses.
-    *   `GEPPolicyEnforcer`: Implements governance rules and audit gates.
-    *   `UposathaCleanerAgent`: Background agent for system entropy reduction (cleanup).
-4.  **Testing:**
-    *   Added `pytest` suite with `pytest-asyncio` and `pytest-cov`.
-    *   Achieved >90% code coverage across core modules.
-    *   Verified "Dialectical Thought" generation and Graph/Vector DB interactions.
+<p align="center">
+  <img src="https://img.shields.io/badge/Architecture-Firma-0077B6?style=for-the-badge&logo=codepen" alt="Firma Architecture Badge">
+  <img src="https://img.shields.io/badge/Testing-90%25%20Coverage-2A9D8F?style=for-the-badge&logo=pytest" alt="Test Coverage Badge">
+  <img src="https://img.shields.io/badge/Paradigm-Knowledge--Centric-E76F51?style=for-the-badge" alt="Knowledge-Centric Paradigm Badge">
+</p>
 
-**Fixes:**
-*   Fixed argument order mismatch in `SimpleKnowledgeGraph.add_edge` and `load_mock_data`.
-*   Fixed dependency injection order in `KnowledgeCentricProcessor`.
+## ✨ บทนำ (Introduction)
+
+**AETHERIUM-GENESIS** คือรากฐานโครงสร้างของระบบปัญญาประดิษฐ์เชิงสถาปัตยกรรม **"Firma"** โปรเจกต์นี้มุ่งเน้นการสร้าง **Knowledge-Centric System** ที่มีความสามารถในการประมวลผลเชิงวิภาษวิธี (Dialectical Thinking) และการจัดการเหตุการณ์แบบ **Trust-Aware Asynchronous Event Bus**
+
+ระบบถูกออกแบบมาเพื่อสร้างสภาพแวดล้อมที่ Agent สามารถทำงานร่วมกันได้อย่างมีประสิทธิภาพ ด้วยความรู้เชิงลึก และอยู่ภายใต้การกำกับดูแล (Governance) ที่เข้มงวด ทำให้เหมาะสำหรับแอปพลิเคชันที่ต้องการความน่าเชื่อถือและความซับซ้อนทางปัญญาในระดับสูง
+
+## 🚀 คุณสมบัติหลัก (Key Features)
+
+* **AetherConductor (Trust-Aware Event Bus):** ระบบ Pub/Sub แบบ Asynchronous พร้อมกลไก **Trust Scoring** และ **Quarantine Logic** สำหรับจัดการเหตุการณ์ที่ไม่น่าเชื่อถือ ทำให้มั่นใจในความสมบูรณ์ของข้อมูลในระบบ
+* **KnowledgeCentricProcessor (KCP):** แกนประมวลผลความรู้ที่จำลอง **"Dialectical Thinking"** (กระบวนการ Thesis → Antithesis → Synthesis) โดยใช้การโต้ตอบกับ Mock Graph และ Vector Database
+* **Modular Agent System:** โครงสร้างรองรับ Agent เฉพาะทางสำหรับการปฏิบัติหน้าที่ที่หลากหลาย เช่น การให้คำปรึกษา การบังคับใช้นโยบาย และการลด System Entropy
+* **Canonical Hashing & Immutability:** ใช้ `Envelope` ซึ่งเป็น Data Carrier ที่ไม่สามารถเปลี่ยนแปลงได้ พร้อมการทำ **Canonical Hashing** เพื่อรับประกันความถูกต้องของข้อมูลตลอดวงจรชีวิตของ Event
+* **High-Coverage Testing:** ชุดทดสอบที่ครอบคลุมด้วย `pytest` และ `pytest-asyncio` พร้อม Code Coverage ที่สูงกว่า **90%** ใน Core Module
+
+---
+
+## 🏗️ โครงสร้างสถาปัตยกรรมหลัก (Core Architecture - "Firma" Blueprint)
+
+โปรเจกต์นี้ถูกจัดโครงสร้างอย่างเป็นระเบียบตามสถาปัตยกรรม "Firma" ดังนี้:
+
+| Directory | บทบาท (Role) | ส่วนประกอบสำคัญ (Key Components) |
+| :--- | :--- | :--- |
+| `core/` | **Core Infrastructure** | `AetherConductor`, `Envelope`, `KCP` (KnowledgeCentricProcessor) |
+| `agents/` | **Specialized Agents** | `AgioSageAgent`, `GEPPolicyEnforcer`, `UposathaCleanerAgent` |
+| `config/` | **System Configuration** | การตั้งค่าเริ่มต้นสำหรับ KCP, Trust Scores, และ Mock DB |
+| `tests/` | **Testing Suite** | `pytest` suite, การทดสอบ "Dialectical Thought" Generation |
+
+### Agent Modules Overview
+
+| Agent | หน้าที่หลัก (Primary Function) |
+| :--- | :--- |
+| **AgioSageAgent** | ใช้ KCP เพื่อให้คำตอบเชิงภูมิปัญญา (Wisdom-based) และคำปรึกษาที่ผ่านกระบวนการสังเคราะห์ |
+| **GEPPolicyEnforcer** | **Governance and Enforcement:** บังคับใช้นโยบาย (Governance Rules) และเป็นด่านตรวจสอบ (Audit Gates) สำหรับการดำเนินการสำคัญ |
+| **UposathaCleanerAgent** | **System Entropy Reduction:** ทำงานในพื้นหลังเพื่อทำความสะอาดระบบ (เช่น Cache Cleanup) เพื่อรักษาประสิทธิภาพในระยะยาว |
+
+---
+
+## 🛠️ การเริ่มต้นใช้งาน (Getting Started)
+
+### ข้อกำหนดเบื้องต้น (Prerequisites)
+
+* Python 3.10+ (แนะนำ)
+* `pip` หรือ `conda`
+
+### การติดตั้ง (Installation)
+
+1.  โคลน Repository:
+    ```bash
+    git clone [https://github.com/lnspirafirma/AETHERIUM-GENESIS.git](https://github.com/lnspirafirma/AETHERIUM-GENESIS.git)
+    cd AETHERIUM-GENESIS
+    ```
+2.  ติดตั้ง Dependencies (รวมถึง `pytest`, `pytest-asyncio`, และไลบรารีอื่น ๆ ที่เกี่ยวข้อง):
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### การเรียกใช้ชุดทดสอบ (Running Tests)
+
+การทดสอบเป็นสิ่งสำคัญในการยืนยันการทำงานของ Core Infrastructure:
+
+```bash
+# รันชุดทดสอบทั้งหมด
+pytest
+
+# รันชุดทดสอบพร้อมรายงาน Code Coverage (เน้นที่ Core Modules)
+pytest --cov=core
