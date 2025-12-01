@@ -1,0 +1,26 @@
+# .github/dependabot.yml
+
+version: 2
+updates:
+  # --- 1. Python Dependencies (pip) ---
+  - package-ecosystem: "pip" # ใช้สำหรับ dependencies ของ Python ที่อยู่ใน requirements.txt
+    directory: "/" # ตำแหน่งของ requirements.txt คือ Root Directory
+    schedule:
+      interval: "daily" # เพิ่มความถี่เป็นรายวัน เพื่อการตอบสนองต่อ CVEs ที่รวดเร็วขึ้น
+    labels:
+      - "dependencies"
+      - "security-audit-pending" # Label สำคัญที่ Trigger Audit Gate
+    reviewers:
+      - "GEPPolicyEnforcer" # กำหนดให้ Agent ผู้คุมกฎเป็น Reviewer หลัก
+
+  # --- 2. GitHub Actions Dependencies ---
+  - package-ecosystem: "github-actions" # ใช้สำหรับ dependencies ของ Actions ใน .github/workflows
+    directory: "/" # ตำแหน่งของ Workflow files (.github/workflows)
+    schedule:
+      interval: "weekly" # ตรวจสอบรายสัปดาห์
+    labels:
+      - "dependencies"
+      - "security-audit-pending"
+    reviewers:
+      - "GEPPolicyEnforcer" # GEPPolicyEnforcer ควบคุม Actions ที่รันบน CI/CD
+      
