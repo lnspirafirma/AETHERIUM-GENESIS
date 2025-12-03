@@ -1,0 +1,31 @@
+# .github/workflows/build.yml
+name: Build and Test Aetherium Genesis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: ⚙️ Checkout Codebase
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        
+    - name: 📦 Install Dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: 🧪 Run Unit Tests (GEP Audit Check)
+      run: |
+        # รันการทดสอบทั้งหมดเพื่อยืนยันความถูกต้องของ GEP/Agent Logic
+        pytest --cov=.
+        
