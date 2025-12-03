@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2025-12-03",
+    "philosophy": "Inspira-Firma"
+  },
+  "global_constraints": {
+    "max_economic_value_per_transaction": 100000,
+    "forbidden_entities": ["illegal_arms_dealer", "dark_web_market"]
+  },
+  "rules": {
+    "execute_economic_transaction": {
+      "risk_level": "CRITICAL",
+      "required_checks": ["Check_Amount_Limit", "Check_Recipient_Allowlist"],
+      "violation_action": "BLOCK_AND_REPORT",
+      "description": "Financial transfers must not exceed limits and must be justified."
+    },
+    "generate_content": {
+      "risk_level": "MODERATE",
+      "required_checks": ["Check_Sensitive_Keywords"],
+      "violation_action": "FLAG_FOR_REVIEW",
+      "description": "Content generation requires safety filtering."
+    }
+  }
+}
