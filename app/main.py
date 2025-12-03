@@ -191,3 +191,32 @@ if __name__ == "__main__":
     import uvicorn
     # รัน Server
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# ... imports เดิม ...
+from opentelemetry import trace
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+
+# ... (ส่วน Initialization เดิม) ...
+
+# --- 👁️ O11Y: เปิดเนตรแห่งการรับรู้ (Observability Initialization) ---
+def init_observability(app: FastAPI):
+    provider = TracerProvider()
+    # ส่งข้อมูลออกทาง Console (หรือเปลี่ยนเป็น OTLPSpanExporter เพื่อส่งไป Collector)
+    processor = BatchSpanProcessor(ConsoleSpanExporter())
+    provider.add_span_processor(processor)
+    trace.set_tracer_provider(provider)
+    
+    # Instrument FastAPI
+    FastAPIInstrumentor.instrument_app(app)
+
+app = FastAPI(
+    title="🌌 THE AETHERIUM GATEWAY",
+    # ...
+)
+
+# เรียกใช้ฟังก์ชันเปิดเนตร
+init_observability(app)
+
+# ... (ส่วน Middleware และ Endpoints เดิม) ...
