@@ -1,14 +1,14 @@
 # .github/workflows/build.yml
-name: Build and Test Aetherium Genesis
+name: Build and Test Aetherium Genesis # ⬅️ รูทคีย์ 1: ชื่อ Workflow
 
-on:
+on: # ⬅️ รูทคีย์ 2: เงื่อนไขการทำงาน
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
 
-jobs:
+jobs: # ⬅️ รูทคีย์ 3: ชุดคำสั่งที่ต้องรัน
   build_and_test:
     runs-on: ubuntu-latest
     steps:
@@ -21,11 +21,10 @@ jobs:
         python-version: "3.11"
         
     - name: 📦 Install Dependencies
-      run: |
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
     
     - name: 🧪 Run Unit Tests (GEP Audit Check)
       run: |
-        # รันการทดสอบทั้งหมดเพื่อยืนยันความถูกต้องของ GEP/Agent Logic
-        pytest --cov=.
+        # 🎯 แก้ไข Structural Conflict: กำหนด PYTHONPATH ให้เท่ากับ Root Directory
+        PYTHONPATH=. pytest --cov=.
         
