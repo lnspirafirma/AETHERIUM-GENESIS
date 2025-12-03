@@ -1,21 +1,13 @@
-version: '3.8'
-
+# ...
 services:
   # 1. Main Service (รวม Config เดิม + ตัวแปรใหม่)
   aether-core:
-    build: .
-    container_name: aetherium_genesis_core
-    volumes:
-      - .:/app
+    # ... (ส่วนบนเหมือนเดิม)
     environment:
       - PYTHONUNBUFFERED=1
-      - OTEL_PYTHON_LOG_CORRELATION=true  # <-- เพิ่มตรงนี้ในลิสต์เดียวกัน
-    command: python main_simulation.py
+      - OTEL_PYTHON_LOG_CORRELATION=true  # <-- O11y Enabled
+    # ❌ แก้ไขจาก: command: python main_simulation.py
+    # ✅ เป็น:
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     restart: unless-stopped
-
-  # 2. Visualization Service (เพิ่มเข้ามาใหม่ในระดับเดียวกับ aether-core)
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - "16686:16686" # UI สำหรับดู Traces (http://localhost:16686)
-      - "4317:4317"   # OTLP gRPC receiver (พอร์ตรับข้อมูล)
+    # ...
