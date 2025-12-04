@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+
 # File: simulation/first_resonance_test.py (Updated Execution Scenario)
 
 # --- 1. MOCK CORE COMPONENTS (Required for Simulation) ---
