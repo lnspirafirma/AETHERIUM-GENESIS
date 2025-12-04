@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 
 # File: simulation/first_resonance_test.py (Updated Execution Scenario)
-
 # --- 1. MOCK CORE COMPONENTS (Required for Simulation) ---
 # NOTE: The provided GEPPolicyEnforcer class is now assumed to be imported and fully functional.
 # For this zero-cost simulation, we will use mock/placeholder values for file loading.
