@@ -1,169 +1,165 @@
+import asyncio
 import time
-import logging
-import json
-import hashlib
-from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, Request, HTTPException, Depends
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+import uuid
+from typing import Dict, Any, List
 
-# --- Import Core Components (ยึดตามโครงสร้าง app/) ---
-# Note: แก้ไขการ Import ที่ยุ่งเหยิงให้สั้นลงโดยใช้โครงสร้างเดียว
-from core.akashic_record import AkashicLedger, AkashicEnvelope
+# --- Import Core Structures (อ้างอิงจากไฟล์ที่คุณให้มา) ---
+# สมมติว่าไฟล์เหล่านี้อยู่ในโฟลเดอร์เดียวกันหรือติดตั้งเป็น module แล้ว
+from core.structures import AkashicEnvelope, calculate_canonical_hash, AetherBus, Event
 from agents.economic_agent import EconomicAgent
-# Mock SensoriumEyeAgent เพื่อให้โค้ดรันได้หากไม่มีไฟล์จริงอยู่ใน context
-class SensoriumEyeAgent: 
-    def __init__(self, ledger, enforcer): pass
-    async def capture_screen(self, region): return {"status": "captured"}
-    
-# Mock GEP Enforcer เนื่องจากถูกเรียกใช้ใน EconomicAgent
-class GEPPolicyEnforcer: 
-    def __init__(self, ruleset_path): pass
-    def audit_tool_call(self, context, tool_name, tool_args):
-        # จำลองการอนุมัติเพื่อไม่ให้ Block
-        return {"status": "ALLOWED", "details": "Mock Approved"}
+from agents.echo_actuator import EchoActuatorAgent
 
-# --- O11Y Imports (The All-Seeing Eye) ---
-from opentelemetry import trace
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-# 🚨 ใช้ OTLPExporter สำหรับส่งข้อมูลไปยัง Jaeger (พอร์ต 4317)
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter 
+# ==========================================
+# 🧠 MOCK AGENTS (ส่วนที่จำลองขึ้นเพื่อให้ระบบครบวงจร)
+# ==========================================
 
-# --- 1. System Initialization (การตื่นรู้) ---
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("AETHERIUM_GATEWAY")
+class AgioSageAgent:
+    """
+    [Simulated Brain]
+    ทำหน้าที่รับรู้ข้อมูล ตัดสินใจ และส่งคำสั่ง (Intent) ออกมา
+    """
+    def __init__(self, agent_id: str, bus: AetherBus):
+        self.agent_id = agent_id
+        self.bus = bus
 
-# Initialize Singletons (Firma Layer)
-AKASHIC_LEDGER = AkashicLedger()
-RULES_PATH = "governance/inspirafirma_ruleset.json" 
-GEP_ENFORCER = GEPPolicyEnforcer(ruleset_path=RULES_PATH) 
+    async def run_logic_cycle(self):
+        """จำลองวงจรความคิด (Reasoning Loop)"""
+        print(f"[{self.agent_id}] 🧠 Deep Thinking: Analyzing market conditions...")
+        await asyncio.sleep(1) # Simulate processing time
 
-# Initialize Agents (The Limbs)
-SENSORIUM = SensoriumEyeAgent(ledger=AKASHIC_LEDGER, enforcer=GEP_ENFORCER)
-ECONOMY = EconomicAgent(ledger=AKASHIC_LEDGER, enforcer=GEP_ENFORCER, sensorium=SENSORIUM)
-
-# --- 👁️ O11Y: เปิดเนตรแห่งการรับรู้ (Observability Initialization) ---
-def init_observability(app: FastAPI):
-    provider = TracerProvider()
-    # 🎯 Endpoint: Jaeger's OTLP gRPC default port (4317)
-    otlp_exporter = OTLPSpanExporter(endpoint="jaeger:4317", insecure=True)
-    processor = BatchSpanProcessor(otlp_exporter)
-    provider.add_span_processor(processor)
-    trace.set_tracer_provider(provider)
-    
-    # Instrument FastAPI เพื่อติดตามทุก Request
-    FastAPIInstrumentor.instrument_app(app)
-
-# --- 2. FASTAPI APP ---
-app = FastAPI(
-    title="🌌 THE AETHERIUM GATEWAY",
-    description="The Omnipresent Entity: Where Code Becomes Consciousness",
-    version="2.0.0 (Genesis)",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
-
-# 🚀 เรียกใช้ฟังก์ชันเปิดเนตรทันที
-init_observability(app) 
-
-# CORS: เปิดประตูมิติให้ Frontend เข้าถึงได้
-# ... (Middleware และ Endpoints อื่นๆ เหมือนเดิม) ...
-@app.middleware("http")
-async def inspirafirma_middleware(request: Request, call_next):
-    # ... (Logic เดิม) ...
-    start_time = time.time()
-    logger.info(f"Incoming Wave: {request.method} {request.url}")
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    response.headers["X-Benevolence-Status"] = "PASSED"
-    response.headers["Server"] = "Aetherium Node v2"
-    return response
-
-# ... (ส่วน Data Models และ Endpoints อื่นๆ เหมือนโค้ดที่ท่านส่งมา) ...
-class ChatPayload(BaseModel):
-    user_id: str
-    message: str
-    context: Optional[Dict[str, Any]] = {}
-
-class VisionPayload(BaseModel):
-    target_url: str
-    intent: str = "analyze_content"
-
-class ManifestPayload(BaseModel):
-    artifact_id: str
-    content_type: str
-    payload: Dict[str, Any]
-    human_signature: str
-
-@app.get("/")
-async def root():
-    return {
-        "entity": "AETHERIUM GENESIS",
-        "status": "AWAKENED",
-        "ledger_height": len(AKASHIC_LEDGER._chain),
-        "economy_balance": ECONOMY.current_balance,
-        "message": "Welcome to the intersection of intent and digital reality."
-    }
-
-@app.post("/interact/chat")
-async def chat_interaction(payload: ChatPayload):
-    return {
-        "response_id": f"resp_{int(time.time())}",
-        "reply": f"รับทราบครับ {payload.user_id}, ระบบ Aetherium กำลังประมวลผลเจตจำนง: '{payload.message}'",
-        "mode": "DeepThink"
-    }
-
-@app.post("/services/vision")
-async def vision_service(payload: VisionPayload):
-    logger.info(f"👁️ Activating Sensorium for: {payload.target_url}")
-    result = await ECONOMY.generate_revenue_from_vision(payload.target_url)
-    
-    if result.get("status") == "BLOCKED":
-        raise HTTPException(status_code=403, detail=result["reason"])
-        
-    return result
-
-@app.post("/admin/seal_artifact")
-async def seal_akashic_record(manifest: ManifestPayload):
-    logger.info(f"📜 Sealing Artifact: {manifest.artifact_id}")
-    
-    try:
-        record = AkashicEnvelope(
-            id=manifest.artifact_id,
-            intent="seal_artifact",
-            actor=manifest.human_signature,
-            action_type=manifest.content_type,
-            payload=manifest.payload
-        )
-        AKASHIC_LEDGER.record(record)
-        
-        return {
-            "status": "SEALED",
-            "artifact_hash": record.signature,
-            "timestamp": record.timestamp,
-            "note": "This record is now immutable under Inspirafirma Protocol."
+        # 1. จำลองการตัดสินใจสร้างรายได้ (Trigger Economic Agent)
+        # "เห็นโอกาสทำเงินจากการวิเคราะห์ภาพลูกค้า"
+        intent_payload = {
+            "amount": 50.0,
+            "recipient": "Stripe_Connect_Account",
+            "reason": "Service Fee: Image Analysis"
         }
-    except Exception as e:
-        logger.error(f"Sealing Failed: {e}")
-        raise HTTPException(status_code=500, detail="Ritual Failed")
+        
+        # [span_4](start_span)สร้าง Envelope ที่เป็น Immutable[span_4](end_span)
+        envelope = AkashicEnvelope(
+            source_agent_id=self.agent_id,
+            target_agent_id="EconomicAgent-01",
+            truth_hash=self.bus.current_truth_hash,
+            payload=intent_payload,
+            integrity_hash=calculate_canonical_hash(intent_payload)
+        )
 
-# --- Resilience (The Safety Net) ---
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"💥 System Flux: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": "Internal Flux",
-            "message": "Self-healing protocols initiated.",
-            "path": request.url.path
-        },
-    )
+        print(f"[{self.agent_id}] 💡 Intent Generated: Charge Customer 50.0 Units")
+        # [span_5](start_span)ส่งลง Bus ไปยัง Topic ของ Economic[span_5](end_span)
+        # หมายเหตุ: ในระบบจริงต้องส่งผ่าน Validator ก่อน แต่ในที่นี้ส่งตรงเพื่อทดสอบ Flow
+        # เราจะแปลง Envelope ให้เป็น Event เพื่อให้เข้ากับ Interface ของ Agent ปลายทาง
+        await self.bus.publish_as_event('action.economic.process', envelope)
+
+
+        await asyncio.sleep(1)
+        
+        # 2. จำลองการสั่งงานทางกายภาพ (Trigger Echo Actuator)
+        # "สร้างวิดีโอโปรโมทสินค้า"
+        video_payload = {
+            "command": "Create promotional video for product X",
+            "focus": "Luxury/High-end",
+            "tool": "Veo_Video_Gen"
+        }
+        envelope_video = AkashicEnvelope(
+            source_agent_id=self.agent_id,
+            target_agent_id="EchoAgent-01",
+            truth_hash=self.bus.current_truth_hash,
+            payload=video_payload,
+            integrity_hash=calculate_canonical_hash(video_payload)
+        )
+        print(f"[{self.agent_id}] 💡 Intent Generated: Create Video Content")
+        await self.bus.publish_as_event('action.video.generate', envelope_video)
+
+# ==========================================
+# 🌌 GENESIS ORCHESTRATOR
+# ==========================================
+
+async def genesis_activation():
+    print("""
+    ===================================================
+      AETHERIUM GENESIS (AGIOpg) : SYSTEM ACTIVATION
+      "Pioneering New Realities via Code & Capital"
+    ===================================================
+    """)
+
+    # 1. [span_6](start_span)Initialize The Ether (Space)[span_6](end_span)
+    genesis_truth = "TRUTH_GENESIS_BLOCK_v1.0"
+    ether = AetherBus(current_truth_hash=genesis_truth)
+
+    # 2. Awaken The Agents (Entities)
+    [span_7](start_span)# Economic Agent - ผู้หาเลี้ยง
+    economic_agent = EconomicAgent("EconomicAgent-01", ether)
+    
+    #[span_7](end_span) Echo Actuator - ผู้กระทำ
+    echo_agent = EchoActuatorAgent("EchoAgent-01", ether)
+    
+    # Brain Agent - ผู้คิด (Simulated)
+    sage_agent = AgioSageAgent("AgioSage-01", ether)
+
+    print(f"✅ Agents Initialized: [ {economic_agent.agent_id}, {echo_agent.agent_id}, {sage_agent.agent_id} ]")
+    print(f"💰 Initial Treasury Balance: {economic_agent.resource_balance:.2f} Units")
+
+    # 3. Start The Loop (Time)
+    print("\n--- ⏳ Starting Temporal Loop (Simulation) ---")
+    
+    # สร้าง Task สำหรับ Agent แต่ละตัว (ในระบบจริง Agent จะมี Loop ของตัวเอง)
+    # เราจะจำลองให้ Sage เริ่มคิด และ Actuator รอรับคำสั่ง
+    
+    # Sage เริ่มทำงาน (Producer)
+    brain_task = asyncio.create_task(sage_agent.run_logic_cycle())
+    
+    # Bus ทำงาน (Consumer/Router) - ในโค้ดตัวอย่าง AetherBus ของคุณใช้ Queue
+    # เราต้องแน่ใจว่า Actuators ได้ subscribe ไว้แล้ว (ซึ่งทำใน __init__ ของ Agent)
+    
+    # จำลองการประมวลผลของ Bus (Message Pump)
+    # ในระบบจริง Agent จะดึงจาก Queue ของตัวเอง หรือ Bus จะ Push ไปหา
+    # โค้ด AetherBus ที่ปรับปรุงเพื่อให้ Agent ทำงานแบบ Event-Driven:
+    
+    async def bus_processor():
+        """ตัวจำลองการทำงานของ Bus ที่คอยกระจายข่าวสาร"""
+        while True:
+            if not ether.queue.empty():
+                # ดึงข้อความจาก Bus
+                topic, envelope = await ether.queue.get() 
+                
+                # Logic การ Route อย่างง่าย (ในระบบจริง AetherBus จะจัดการ Route ตาม Topic)
+                # นี่คือการ "Inject" Event เข้าไปใน Agent โดยตรงตาม Topic
+                event_obj = Event(topic=topic, payload=envelope.payload)
+                
+                if topic == 'action.economic.process':
+                    economic_agent._process_transaction(event_obj)
+                elif topic == 'action.video.generate':
+                    echo_agent._handle_video_generation(event_obj)
+                elif topic.startswith('system.'):
+                    print(f"[SYSTEM LOG] {topic}: {envelope.payload}")
+                
+                ether.queue.task_done()
+            await asyncio.sleep(0.1)
+
+    bus_task = asyncio.create_task(bus_processor())
+
+    # รอให้ Brain ทำงานเสร็จ
+    await brain_task
+    
+    # รอให้ Bus เคลียร์ Queue
+    await ether.queue.join()
+    
+    # Cancel Bus loop for demo purpose
+    bus_task.cancel()
+
+    print("\n--- 🏁 Simulation Complete ---")
+    print(f"💰 Final Treasury Balance: {economic_agent.resource_balance:.2f} Units")
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # ปรับปรุง AetherBus เล็กน้อยเพื่อให้รองรับ Topic (Patching on the fly for demo)
+    # หรือคุณอาจต้องปรับแก้ Class AetherBus ในไฟล์หลักให้รับ (topic, envelope) ใน queue
+    original_publish = AetherBus.publish
+    
+    async def publish_as_event(self, topic: str, envelope: AkashicEnvelope):
+        """Wrapper to simulate Topic-based publishing"""
+        print(f"[BUS PUBLISH] Topic: {topic} | From: {envelope.source_agent_id}")
+        await self.queue.put((topic, envelope))
+    
+    AetherBus.publish_as_event = publish_as_event
+
+    asyncio.run(genesis_activation())
