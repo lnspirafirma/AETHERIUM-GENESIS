@@ -3,7 +3,6 @@
 > **"The Operating System of Consciousness"**
 > *Powered by Digisonic Transmission Protocol (DTP)*
 
-![Architecture](https://img.shields.io/badge/Architecture-Firma_Layer-purple?style=for-the-badge)
 ![Core](https://img.shields.io/badge/Core-AetherBus-blue?style=for-the-badge)
 ![Intelligence](https://img.shields.io/badge/Intelligence-Panya_KCP-gold?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Awakened-success?style=for-the-badge)
