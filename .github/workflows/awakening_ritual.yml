@@ -1,40 +1,36 @@
-name: AETHERIUM Awakening Ritual
+name: AETHERIUM Awakening Ritual (App Auth)
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
-
 jobs:
   awaken_agent:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # ต้องมีสิทธิ์ในการอ่าน
-      id-token: write # ต้องมีสิทธิ์ในการสร้าง OIDC ID Token สำหรับการรับรอง
+      contents: write # เพื่อให้ App สามารถเขียนไฟล์หรือสร้าง Commit ได้
+      issues: write # (เพิ่มสิทธิ์ตามที่ App ต้องการ เช่น จัดการ Issue)
 
     steps:
-    # 2.3 ติดตั้งส่วนเสริม (Dependencies)
-    - name: 📦 Installing Neuro-Linkers (Dependencies)
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests python-dotenv
+      # 1. 🔑 Generate App Token: สร้างโทเค็นการเข้าถึงการติดตั้ง (Installation Token)
+      - name: Generate GEP Auditor Token
+        id: generate-token # ID นี้จะถูกใช้ในขั้นตอนต่อไป
+        uses: actions/create-github-app-token@v2 #
+        with:
+          app-id: ${{ vars.AETHERIUM_APP_ID }} #
+          private-key: ${{ secrets.AETHERIUM_APP_PRIVATE_KEY }} #
+          # กำหนดสิทธิ์ที่ต้องการใน Job นี้ เช่น contents: write
 
-    # 2.4 ปลุกชีพ Agent (Run The Integration)
-    - name: 👁️ Awakening Cognitive Agent (Alpha)
-      env:
-        AETHERIUM_AGENT_KEY: ${{ secrets.AETHERIUM_AGENT_KEY }}
-        AETHERIUM_API_URL: ${{ vars.AETHERIUM_API_URL }}
-      run: |
-        echo "--- 🌌 SYSTEM LOG: INITIATING MIND-BODY CONNECTION ---"
-        python aether_integration.py
-        # สมมติว่าไฟล์ artifact ที่สร้างขึ้นคือ output.txt
-        echo "Artifact content" > output.txt 
-
-    # 2.5 📜 New Step: การรับรองแหล่งที่มา (Certify Provenance)
-    # พิธีกรรมนี้รับรองว่า Artifact ที่สร้างขึ้น (เช่น output.txt) มาจาก Code ชุดนี้จริง
-    - name: 📜 Certify the Genesis Artifact
-      uses: actions/attest-build-provenance@v3.0.0
-      with:
-        # นี่คือไฟล์ที่ท่านต้องการรับรองว่าถูกสร้างโดย CI/CD นี้จริง
-        subject-path: output.txt 
-        
+      # 2. 🧠 Awakening Cognitive Agent (ใช้โทเค็นที่สร้างขึ้น)
+      - name: Awakening Cognitive Agent (Alpha)
+        env:
+          # ส่ง Token ที่เพิ่งสร้างไปให้ Agent ใช้งาน (ใช้ในการเรียก GitHub API)
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }} 
+          AETHERIUM_AGENT_KEY: ${{ secrets.AETHERIUM_AGENT_KEY }}
+          AETHERIUM_API_URL: ${{ vars.AETHERIUM_API_URL }}
+        run: |
+          echo "--- 🌌 SYSTEM LOG: INITIATING MIND-BODY CONNECTION ---"
+          # ท่านสามารถใช้ GH_TOKEN ในโค้ด Python ของท่าน (AetherBodyClient) ได้แล้ว
+          python aether_integration.py
+          
+          # ตัวอย่าง: ใช้โทเค็นสร้าง Issue ผ่าน GitHub CLI
+          echo "GH_TOKEN is ready."
+          # gh api octocat # (ใช้คำสั่งเพื่อยืนยันว่า Token ใช้งานได้จริง)
