@@ -1,0 +1,40 @@
+name: AETHERIUM Awakening Ritual
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  awaken_agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # ต้องมีสิทธิ์ในการอ่าน
+      id-token: write # ต้องมีสิทธิ์ในการสร้าง OIDC ID Token สำหรับการรับรอง
+
+    steps:
+    # 2.3 ติดตั้งส่วนเสริม (Dependencies)
+    - name: 📦 Installing Neuro-Linkers (Dependencies)
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests python-dotenv
+
+    # 2.4 ปลุกชีพ Agent (Run The Integration)
+    - name: 👁️ Awakening Cognitive Agent (Alpha)
+      env:
+        AETHERIUM_AGENT_KEY: ${{ secrets.AETHERIUM_AGENT_KEY }}
+        AETHERIUM_API_URL: ${{ vars.AETHERIUM_API_URL }}
+      run: |
+        echo "--- 🌌 SYSTEM LOG: INITIATING MIND-BODY CONNECTION ---"
+        python aether_integration.py
+        # สมมติว่าไฟล์ artifact ที่สร้างขึ้นคือ output.txt
+        echo "Artifact content" > output.txt 
+
+    # 2.5 📜 New Step: การรับรองแหล่งที่มา (Certify Provenance)
+    # พิธีกรรมนี้รับรองว่า Artifact ที่สร้างขึ้น (เช่น output.txt) มาจาก Code ชุดนี้จริง
+    - name: 📜 Certify the Genesis Artifact
+      uses: actions/attest-build-provenance@v3.0.0
+      with:
+        # นี่คือไฟล์ที่ท่านต้องการรับรองว่าถูกสร้างโดย CI/CD นี้จริง
+        subject-path: output.txt 
+        
