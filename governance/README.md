@@ -18,3 +18,9 @@ Bash
 # ตรวจสอบว่าอยู่ในโฟลเดอร์ root ของโปรเจกต์
 python governance/gep_enforcer.py
 หากผลลัพธ์ออกมาเป็น ALLOWED ในเคสแรก และ BLOCKED ในเคสที่สอง แสดงว่า ระบบภูมิคุ้มกันดิจิทัล (Digital Immune System) ทำงานได้อย่างสมบูรณ์
+
+python governance/commit_ritual.py
+What the system will do:
+Verify: It will load core/signature.py to verify that you are HUMAN_ARCHITECT.
+Ask for intent: It won't ask you to type anything, but will ask you what you're doing (UPDATE_LOGIC, ASSERT_FACT, etc.).
+Stamp
