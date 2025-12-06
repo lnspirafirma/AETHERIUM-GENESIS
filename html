@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Document Layout</title>
+    <style>
+        /* 1. Reset & Base Variables */
+        :root {
+            --font-main: 'Helvetica Neue', Arial, sans-serif;
+            --color-text: #333333;
+            --color-heading: #000000;
+            --color-subtitle: #666666;
+            --page-bg: #f4f4f4;
+            --doc-bg: #ffffff;
+            --spacing-base: 1.5rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--page-bg);
+            font-family: var(--font-main);
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 2. Layout Container (Paper-like look) */
+        .document-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 4rem;
+            background-color: var(--doc-bg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+        }
+
+        /* 3. Typography */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--color-heading);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        h1 { font-size: 2.5rem; font-weight: 700; }
+        h2 { font-size: 2rem; font-weight: 700; }
+        h3 { font-size: 1.75rem; font-weight: 600; }
+        
+        .subtitle {
+            font-family: 'Georgia', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--color-subtitle);
+            margin-bottom: 2rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        ol, ul {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        /* 4. Utility Classes */
+        .text-center { text-align: center; }
+        
+        /* 5. Responsive Adjustments */
+        @media (max-width: 768px) {
+            .document-container {
+                margin: 0;
+                padding: 1.5rem;
+                box-shadow: none;
+                width: 100%;
+            }
+            
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="document-container">
+        <h1>หัวข้อหลัก (Title)</h1>
+        <div class="subtitle">คำโปรยรอง (Subtitle)</div>
+
+        <h2>หัวข้อย่อยระดับที่ 1</h2>
+        <p>เนื้อหาในย่อหน้านี้ได้รับการจัดรูปแบบให้อ่านง่าย โดยใช้หน่วย rem แทน pt เพื่อการแสดงผลที่ดีบนทุกหน้าจอ</p>
+
+        <h3>หัวข้อย่อยระดับที่ 2</h3>
+        <ol>
+            <li>รายการที่ 1</li>
+            <li>รายการที่ 2</li>
+        </ol>
+    </main>
+
+</body>
+</html>
