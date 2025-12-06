@@ -87,12 +87,15 @@ class KnowledgeCentricProcessor:
         contradictions = []
         seen_ids = set()
 
+        # Create a set of input node IDs to prevent overlapping with Thesis
+        thesis_ids = {n.id for n in nodes}
+
         for node in nodes:
             # Query Graph Database: "Find nodes linked by 'conflicts_with' edge"
             conflict_ids = self.graph_db.get_related_ids(node.id, relation_type="conflicts_with")
 
             for cid in conflict_ids:
-                if cid not in seen_ids:
+                if cid not in seen_ids and cid not in thesis_ids:
                     # ดึงข้อมูล Node เต็มจาก ID
                     conflict_node = self.graph_db.get_node(cid)
                     if conflict_node:
