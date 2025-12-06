@@ -1,5 +1,6 @@
 import asyncio
-from typing import List, Dict, Any, Optional
+import numpy as np
+from typing import List, Dict, Any, Optional, Tuple
 from core.knowledge_base import KnowledgeNode, SimpleKnowledgeGraph
 
 class SimpleVectorDB:
@@ -51,13 +52,19 @@ class SimpleVectorDB:
 class KnowledgeCentricProcessor:
     """
     KCP (Panya Engine):
-    เปลี่ยนจากการ Search หาคำตอบ เป็นการ 'สังเคราะห์' คำตอบจากความขัดแย้ง
+    Combines Dialectical Thinking with RAG/Memory Bank capabilities.
     """
 
-    def __init__(self, graph_db: SimpleKnowledgeGraph, vector_db: SimpleVectorDB):
-        self.graph_db = graph_db
-        self.vector_db = vector_db
+    def __init__(self, graph_db: Optional[SimpleKnowledgeGraph] = None, vector_db: Optional[SimpleVectorDB] = None, embedding_dim=512):
+        self.graph_db = graph_db or SimpleKnowledgeGraph()
+        self.vector_db = vector_db or SimpleVectorDB(self.graph_db)
 
+        # --- RAG / MindLogic Components ---
+        self.knowledge_base: Dict[str, np.ndarray] = {} # Key -> Embedding
+        self.history_log: List[str] = []
+        self.embedding_dim = embedding_dim
+
+    # --- Dialectical Methods (Original KCP) ---
     async def synthesize_wisdom(self, query: str) -> str:
         """
         The Dialectical Loop: Thesis -> Antithesis -> Synthesis
@@ -135,3 +142,48 @@ class KnowledgeCentricProcessor:
             f"Create a new insight (Synthesis) that resolves this paradox "
             f"aligning with Constructive Evolution."
         )
+
+    # --- RAG / Embedding Methods (MindLogic Enhancements) ---
+
+    def _generate_embedding(self, text: str) -> np.ndarray:
+        """ สร้าง Embedding Vector จำลอง (512-dim) """
+        np.random.seed(hash(text) % 2**32)
+        return np.random.rand(self.embedding_dim)
+
+    def get_embedding_with_fallback(self, data_input: str) -> Dict:
+        """ จำลองการดึง Embedding พร้อม Fallback Logic """
+        # Simplified: Always succeed for simulation
+        vector = self._generate_embedding(data_input)
+        return {'vector': vector, 'source': 'Core_Model', 'dim': len(vector)}
+
+    def add_knowledge(self, data_input: str, embedding: np.ndarray, source: str, dim: int):
+        """
+        ประมวลผลและจัดเก็บ Input เป็นความรู้ใหม่ลง Memory Bank
+        """
+        if data_input in self.knowledge_base:
+            return
+
+        self.knowledge_base[data_input] = embedding
+        self.history_log.append(f"Added: '{data_input}' from {source} (Dim: {dim})")
+
+    def rag_retrieve(self, current_embedding: np.ndarray) -> Tuple[str, float]:
+        """ จำลองการดึงความรู้ที่ใกล้เคียงที่สุดจาก Memory Bank (RAG) """
+        if not self.knowledge_base:
+            return "The Void", 0.0
+
+        best_key = ""
+        max_sim = -1.0
+
+        for key, vector in self.knowledge_base.items():
+            # Calculate Cosine Similarity
+            # Ensure vectors are same dimension, trim if needed
+            k_vec = vector[:self.embedding_dim]
+            c_vec = current_embedding[:self.embedding_dim]
+
+            similarity = np.dot(c_vec, k_vec) / (np.linalg.norm(c_vec) * np.linalg.norm(k_vec))
+
+            if similarity > max_sim:
+                max_sim = similarity
+                best_key = key
+
+        return best_key, float(max_sim) if max_sim > 0 else 0.0
