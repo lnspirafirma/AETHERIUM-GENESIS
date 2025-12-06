@@ -82,3 +82,12 @@ AETHERIUM_AGENT_KEY=<YOUR_INTERNAL_AGENT_TOKEN>
 
 # NETWORK CONFIG
 AETHERIUM_API_URL=[SECURE_INTERNAL_ENDPOINT]
+
+
+แนวทางต่อไป
+
+
+Architectural design: การออกแบบทางสถาปัตยกรรม
+Architectural engineering: วิศวกรรมสถาปัตยกรรม
+Architectural history: ประวัติศาสตร์สถาปัตยกรรม
+Architectural masterpiece: ผลงานชิ้นเอกทางสถาปัตยกรรม
