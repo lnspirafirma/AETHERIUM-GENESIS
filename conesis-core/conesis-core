@@ -1,0 +1,6 @@
+// Exposing the spatial contracts to the rest of the genesis system
+pub mod petstore;
+
+// Re-export common types for easier access
+pub use petstore::{Pet, PetStatus, Order};
+
