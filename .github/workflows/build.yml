@@ -13,7 +13,7 @@ jobs: # ⬅️ รูทคีย์ 3: ชุดคำสั่งที่ต�
     runs-on: ubuntu-latest
     steps:
     - name: ⚙️ Checkout Codebase
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
     
     - name: 🐍 Set up Python 3.11
       uses: actions/setup-python@v6
