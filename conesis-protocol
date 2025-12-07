@@ -1,1 +1,120 @@
+import time
+import hashlib
+import json
+import logging
+from enum import Enum
+from typing import Dict, Any, Optional
+from dataclasses import dataclass, asdict
+
+# ตั้งค่า Logger
+logger = logging.getLogger("ConesisProtocol")
+
+class ConesisOpCode(Enum):
+    """รหัสคำสั่งมาตรฐาน (Operation Codes)"""
+    HELLO = "HELLO"           # เริ่มต้นการเชื่อมต่อ
+    WELCOME = "WELCOME"       # ตอบรับการเชื่อมต่อ
+    HEARTBEAT = "HEARTBEAT"   # สัญญาณชีพ
+    DATA_SYNC = "DATA_SYNC"   # ส่งข้อมูลทั่วไป
+    CONSENSUS = "CONSENSUS"   # ขอการยืนยันความถูกต้อง
+    ERROR = "ERROR"           # แจ้งข้อผิดพลาด
+
+@dataclass
+class ConesisPacket:
+    """โครงสร้างมาตรฐานของแพ็กเก็ตข้อมูล (Data Structure)"""
+    version: str
+    op_code: str
+    sender_id: str
+    target_id: str
+    timestamp: float
+    payload: Dict[str, Any]
+    signature: str = "" # Hash signature
+
+    def to_json(self) -> str:
+        return json.dumps(asdict(self), sort_keys=True)
+
+class ConesisProtocol:
+    """
+    Conesis Protocol Handler
+    จัดการกฎระเบียบ การสร้าง และการตรวจสอบความถูกต้องของข้อมูลในระบบ Aetherium
+    """
+    VERSION = "1.0.0-GENESIS"
+
+    @staticmethod
+    def create_packet(sender_id: str, target_id: str, op_code: ConesisOpCode, payload: Dict[str, Any]) -> ConesisPacket:
+        """สร้างแพ็กเก็ตมาตรฐานพร้อมประทับตราเวลาและลายเซ็น"""
+        packet = ConesisPacket(
+            version=ConesisProtocol.VERSION,
+            op_code=op_code.value,
+            sender_id=sender_id,
+            target_id=target_id,
+            timestamp=time.time(),
+            payload=payload
+        )
+        packet.signature = ConesisProtocol._generate_signature(packet)
+        return packet
+
+    @staticmethod
+    def validate_packet(packet_data: Dict[str, Any]) -> bool:
+        """ตรวจสอบความถูกต้องของแพ็กเก็ต (Integrity Check)"""
+        try:
+            # จำลองการโหลดข้อมูลกลับเข้า Object เพื่อตรวจสอบ
+            packet = ConesisPacket(**packet_data)
+            
+            # 1. ตรวจสอบ Version
+            if packet.version != ConesisProtocol.VERSION:
+                logger.warning(f"Protocol Mismatch: {packet.version} vs {ConesisProtocol.VERSION}")
+                return False
+
+            # 2. ตรวจสอบ Signature (Tamper Evidence)
+            expected_sig = ConesisProtocol._generate_signature(packet)
+            if packet.signature != expected_sig:
+                logger.error("Invalid Signature! Data might be tampered.")
+                return False
+
+            return True
+        except Exception as e:
+            logger.error(f"Validation Error: {e}")
+            return False
+
+    @staticmethod
+    def _generate_signature(packet: ConesisPacket) -> str:
+        """สร้าง Signature จากข้อมูลใน Packet (ไม่รวม Signature เดิม)"""
+        # สร้าง String จากข้อมูลสำคัญเพื่อนำไป Hash
+        raw_data = f"{packet.version}{packet.op_code}{packet.sender_id}{packet.timestamp}{json.dumps(packet.payload, sort_keys=True)}"
+        return hashlib.sha256(raw_data.encode('utf-8')).hexdigest()
+
+# --- ส่วนทดสอบการทำงาน (Integration Test Mock) ---
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    
+    # 1. จำลอง Agent A สร้างข้อมูลส่งหา Agent B
+    agent_a = "Agent-Alpha"
+    agent_b = "Agent-Beta"
+    
+    payload_data = {"command": "update_knowledge", "vector_id": 101}
+    
+    print(f"📡 [A] Creating Packet...")
+    packet = ConesisProtocol.create_packet(
+        sender_id=agent_a,
+        target_id=agent_b,
+        op_code=ConesisOpCode.DATA_SYNC,
+        payload=payload_data
+    )
+    
+    print(f"📦 Packet Generated: {packet.to_json()}")
+    
+    # 2. จำลองการส่งข้อมูล (Serialize -> Deserialize)
+    received_data = json.loads(packet.to_json())
+    
+    # 3. Agent B ตรวจสอบความถูกต้อง
+    print(f"\n🛡️ [B] Validating Packet...")
+    is_valid = ConesisProtocol.validate_packet(received_data)
+    print(f"Result: {'✅ Valid' if is_valid else '❌ Invalid'}")
+
+    # 4. ทดสอบการปลอมแปลงข้อมูล (Tampering Test)
+    print(f"\n🕵️ [Hacker] Trying to modify payload...")
+    received_data['payload']['vector_id'] = 999 # แอบแก้ข้อมูล
+    
+    is_valid_tampered = ConesisProtocol.validate_packet(received_data)
+    print(f"Result: {'✅ Valid' if is_valid_tampered else '❌ Invalid (Tamper Detected)'}")
 
