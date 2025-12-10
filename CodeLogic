@@ -1,0 +1,39 @@
+use conesis_protocol::{Pet, PetStatus};
+use crate::ConesisResult; // Assumed custom error type
+
+/// [Rexilon Handler] Fetch Pet Vector
+/// Simulates retrieval of an entity from the memory bank.
+pub fn get_pet_by_id(pet_id: i64) -> ConesisResult<Pet> {
+    // [GEP] In a real scenario, this connects to the database.
+    // Here we simulate a "Consciousness Retrieval".
+    
+    if pet_id < 0 {
+        // Handle negative ID gracefully (since we allow i64)
+        // This is a logic check, not a memory crash.
+        return Err("Invalid Dimensional ID: Negative values not permitted in this sector".into());
+    }
+
+    let entity = Pet {
+        id: pet_id,
+        name: "Fluffy".to_string(),
+        tag: Some("dog".to_string()),
+        status: Some(PetStatus::Available),
+    };
+
+    Ok(entity)
+}
+
+/// [Rexilon Handler] Transform Intent -> Order
+/// Simulates processing a purchase intent.
+pub fn process_order_intent(pet_id: i64, quantity: i32) -> String {
+    if quantity <= 0 {
+         return format!("Intent Rejected: Quantity {quantity} is non-existential.");
+    }
+
+    // Logic processing...
+    format!(
+        "Intent Transformed: Acquiring Entity ID {} (Quantity: {})", 
+        pet_id, quantity
+    )
+}
+

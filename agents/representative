@@ -1,0 +1,16 @@
+import { ToolLoopAgent } from 'ai';
+
+const sandboxAgent = new ToolLoopAgent({
+  model: 'openai/gpt-5-codex',
+  system: 'You are an agent with access to a shell environment.',
+  tools: {
+    local_shell: openai.tools.localShell({
+      execute: async ({ action }) => {
+        const [cmd, ...args] = action.command;
+        const sandbox = await getSandbox(); // Vercel Sandbox
+        const command = await sandbox.runCommand({ cmd, args });
+        return { output: await command.stdout() };
+      },
+    }),
+  },
+});

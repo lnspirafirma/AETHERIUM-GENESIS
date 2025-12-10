@@ -1,0 +1,156 @@
+from dataclasses import dataclass, field
+from typing import Dict, List, Callable, Optional, Any
+from enum import Enum, auto
+import time
+
+# --- [DATA STRUCTURES: STRUCTURAL VECTORS] ---
+# Defines the shape of data flowing through the spatial construct.
+
+class SystemStatus(Enum):
+    OFFLINE = auto()
+    STANDBY = auto()
+    PROCESSING = auto()
+    ERROR = auto()
+
+@dataclass(frozen=True)
+class RawVector:
+    """Represents the raw input signal (Rod Input)."""
+    content: str
+    detected_emotion: str
+    intensity: float
+    timestamp: float = field(default_factory=time.time)
+
+@dataclass(frozen=True)
+class InspiraVector:
+    """Represents the transformed intent (Rexilon Output)."""
+    original_emotion: str
+    derived_intent: str
+    frame: str
+    resonance_level: float
+
+# --- [INSPIRA: REXILON - The Transformer Engine] ---
+# Handles the dimensional shift from 'Emotion' to 'Intent'.
+
+class RexilonTransformer:
+    def __init__(self):
+        # Maps Raw Emotion (Low Dimension) -> Hidden Intent (High Dimension)
+        self._transformation_matrix: Dict[str, str] = {}
+
+    def register_rule(self, raw_emotion: str, hidden_intent: str) -> None:
+        self._transformation_matrix[raw_emotion.lower()] = hidden_intent
+
+    def apply_lorentz_boost(self, raw_vector: RawVector) -> InspiraVector:
+        # Transform logic: Shift perspective while preserving magnitude
+        intent = self._transformation_matrix.get(
+            raw_vector.detected_emotion, 
+            "unknown_intent"
+        )
+        
+        return InspiraVector(
+            original_emotion=raw_vector.detected_emotion,
+            derived_intent=intent,
+            frame="compassion_frame",
+            resonance_level=raw_vector.intensity
+        )
+
+# --- [FIRMA: CHELVAS CORE - The System Orchestrator] ---
+# The central node connecting Rod (Input), Rexilon (Process), and Cone (Output).
+
+class ChelvasCore:
+    def __init__(self, system_id: str = "CHELVAS-01"):
+        self.system_id = system_id
+        self.status = SystemStatus.STANDBY
+        self.transformer = RexilonTransformer()
+        
+        # Configuration Maps
+        self._keyword_map: Dict[str, List[str]] = {}
+        self._cone_handlers: Dict[str, Callable[[InspiraVector], str]] = {}
+        
+        # Ethical Protocols
+        self.consent_required = True
+
+    # --- [Configuration Interface] ---
+
+    def map_detection_logic(self, emotion_key: str, keywords: List[str]):
+        self._keyword_map[emotion_key] = [k.lower() for k in keywords]
+
+    def map_cone_handler(self, intent_key: str, handler: Callable[[InspiraVector], str]):
+        self._cone_handlers[intent_key] = handler
+
+    # --- [Internal Logic Pipelines] ---
+
+    def _rod_detection(self, text: str) -> RawVector:
+        text_lower = text.lower()
+        detected_emotion = "neutral"
+        intensity = 0.1
+
+        for emotion, keywords in self._keyword_map.items():
+            if any(k in text_lower for k in keywords):
+                detected_emotion = emotion
+                intensity = 0.85 # Simulation of high resonance
+                break
+        
+        return RawVector(content=text, detected_emotion=detected_emotion, intensity=intensity)
+
+    def _cone_execution(self, vector: InspiraVector) -> str:
+        handler = self._cone_handlers.get(vector.derived_intent)
+        if handler:
+            return handler(vector)
+        return f"[SYSTEM LOG] Intent '{vector.derived_intent}' acknowledged. No specific action protocol."
+
+    # --- [Master Execution Flow] ---
+
+    def process_signal(self, input_text: str, consent_token: bool = False) -> None:
+        print(f"\n--- [{self.system_id}] SIGNAL INGRESS ---")
+        self.status = SystemStatus.PROCESSING
+
+        # 1. Ethical Gate
+        if self.consent_required and not consent_token:
+            print("[ACCESS DENIED] Ethical Protocol: Consent Missing.")
+            self.status = SystemStatus.STANDBY
+            return
+
+        # 2. Rod Logic (Sense)
+        raw_vec = self._rod_detection(input_text)
+        print(f"1. ROD DETECTED: [{raw_vec.detected_emotion.upper()}] (Intensity: {raw_vec.intensity})")
+
+        # 3. Rexilon Logic (Transform)
+        inspira_vec = self.transformer.apply_lorentz_boost(raw_vec)
+        print(f"2. REXILON SHIFT: {raw_vec.detected_emotion} -> {inspira_vec.derived_intent.upper()}")
+
+        # 4. Cone Logic (Act)
+        outcome = self._cone_execution(inspira_vec)
+        print(f"3. CONE OUTPUT:  {outcome}")
+        
+        self.status = SystemStatus.STANDBY
+
+# --- [DEPLOYMENT / RUNTIME] ---
+
+def protocol_safety_net(vec: InspiraVector) -> str:
+    return f">> ENGAGING SAFETY PROTOCOLS. User requires validation. (Resonance: {vec.resonance_level})"
+
+def protocol_reinforcement(vec: InspiraVector) -> str:
+    return f">> RECORDING SUCCESS METRIC. Aligning system trajectory."
+
+if __name__ == "__main__":
+    # Initialize
+    core = ChelvasCore()
+
+    # Configure Rexilon (The "Soul" Mapping)
+    core.transformer.register_rule("anger", "seek_safety")
+    core.transformer.register_rule("joy", "confirm_path")
+    core.transformer.register_rule("confusion", "seek_clarity")
+
+    # Configure Rod (The "Ears")
+    core.map_detection_logic("anger", ["hate", "mad", "error", "fail"])
+    core.map_detection_logic("joy", ["success", "happy", "good", "working"])
+    core.map_detection_logic("confusion", ["what", "why", "stuck", "dunno"])
+
+    # Configure Cone (The "Hands")
+    core.map_cone_handler("seek_safety", protocol_safety_net)
+    core.map_cone_handler("confirm_path", protocol_reinforcement)
+
+    # Execution Simulation
+    core.process_signal("I hate that this keeps failing!", consent_token=True)
+    core.process_signal("Wow, this is working perfectly.", consent_token=True)
+    core.process_signal("Wait, I don't have permission.", consent_token=False)

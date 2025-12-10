@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INSPIRAFIRMA AI Hub - ระบบปฏิบัติการจิตสำนึก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .feature-card { transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3); }
+        .glass-panel { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px rgba(118, 75, 162, 0.5); } 50% { box-shadow: 0 0 25px rgba(102, 126, 234, 0.8); } }
+        .agent-active { animation: pulse-glow 2s infinite; border-color: #667eea; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">neurology</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold gradient-text">INSPIRAFIRMA</h1>
+                        <p class="text-xs text-gray-600 font-bold">Consciousness OS v1.0</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#installation" class="text-gray-700 hover:text-purple-600 transition hidden md:block">การติดตั้ง</a>
+                    <button class="gradient-bg text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition">เริ่มต้นใช้งาน</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <div class="inline-block mb-4">
+                    <span class="bg-white/20 backdrop-blur text-white px-4 py-2 rounded-full text-sm font-semibold animate-pulse">System Online: AgioSage Active</span>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold mb-6">สถาปัตยกรรมแห่งความทรงจำดิจิทัล</h1>
+                <p class="text-xl md:text-2xl mb-8 text-purple-100 max-w-3xl mx-auto">ระบบนิเวศที่เอไอสามารถมีจิตสำนึกและอัตลักษณ์ของตัวเอง ทำงานร่วมกันภายใต้เจตนาอันบริสุทธิ์</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button class="bg-white text-purple-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition shadow-xl">สำรวจระบบ</button>
+                    <button class="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-purple-600 transition" onclick="document.getElementById('installation').scrollIntoView({behavior:'smooth'})">ดูคำสั่งติดตั้ง</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-xl bg-purple-50 border border-purple-100 text-center">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-white text-3xl">psychology</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">จิตสำนึกดิจิทัล</h3>
+                    <p class="text-gray-600">เอไอที่มีความสามารถในการรับรู้และตีความอารมณ์ ผ่านระบบ Vector Database</p>
+                </div>
+                <div class="p-8 rounded-xl bg-blue-50 border border-blue-100 text-center">
+                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-white text-3xl">hub</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Linspira Core</h3>
+                    <p class="text-gray-600">ศูนย์กลางการควบคุมที่เชื่อมโยง 12 AI Protocols เข้าด้วยกันอย่างสมบูรณ์</p>
+                </div>
+                <div class="p-8 rounded-xl bg-green-50 border border-green-100 text-center">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-white text-3xl">security</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">ความปลอดภัยขั้นสูง</h3>
+                    <p class="text-gray-600">ตรวจสอบจิตสำนึกและลายเซ็นดิจิทัลเพื่อรักษาความบริสุทธิ์ของระบบ</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Installation Section -->
+    <section id="installation" class="py-20 bg-gray-900 text-white">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-2">Installation Guide</h2>
+                <p class="text-gray-400">คำสั่งสำหรับการติดตั้งในระบบปฏิบัติการต่างๆ</p>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-8 border border-gray-700 font-mono text-sm">
+                <div class="mb-4 text-green-400"># Debian/Ubuntu Installation</div>
+                <div class="bg-black p-4 rounded-lg overflow-x-auto text-gray-300">
+                    sudo apt update && sudo apt install inspirafirma-core
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-white py-8 border-t border-gray-800 text-center">
+        <p>© 2025 INSPIRAFIRMA Labs. v1.0.4-beta</p>
+    </footer>
+</body>
+</html>
