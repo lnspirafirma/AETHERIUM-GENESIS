@@ -27,7 +27,8 @@ class GEPPolicyEnforcer(BaseAgent):
             self.pending_audits[envelope.flow_id] = envelope
             await self.publish("query.knowledge.retrieve", AetherIntent.QUERY_TRUTH, {
                 "query": rule["agio_query_template"],
-                "context": envelope.payload
+                "context": envelope.payload,
+                "_security_context": "AGIO-CODEX System Message"
             }, envelope.flow_id)
         else:
             await self._approve(envelope)
@@ -46,4 +47,9 @@ class GEPPolicyEnforcer(BaseAgent):
 
     async def _reject(self, env, reason):
         print(f"[SAG] 🛑 Rejected: {reason}")
-        await self.publish("aether.tasks.failed", AetherIntent.ASSERT_FACT, {"reason": reason}, env.flow_id)
+        # Add security context to ensure system messages are trusted
+        payload = {
+            "reason": reason,
+            "_security_context": "AGIO-CODEX System Message"
+        }
+        await self.publish("aether.tasks.failed", AetherIntent.ASSERT_FACT, payload, env.flow_id)
