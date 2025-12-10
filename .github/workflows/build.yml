@@ -1,22 +1,25 @@
-# .github/workflows/build.yml
-name: Build and Test Aetherium Genesis # ⬅️ รูทคีย์ 1: ชื่อ Workflow
+name: Build and Test Aetherium Genesis
 
-on: # ⬅️ รูทคีย์ 2: เงื่อนไขการทำงาน
+on:
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
 
-jobs: # ⬅️ รูทคีย์ 3: ชุดคำสั่งที่ต้องรัน
+jobs:
   build_and_test:
     runs-on: ubuntu-latest
     steps:
+      # 1. ⚙️ Checkout Codebase
+      # เปลี่ยนจาก actions/checkout@v4 เป็น Full Commit SHA ของ v4
     - name: ⚙️ Checkout Codebase
-      uses: actions/checkout@v4
+      uses: actions/checkout@0f2a7bc72297127b3d39589d816172605f6b8b7e # [Commit SHA ล่าสุดของ actions/checkout@v4]
     
+      # 2. 🐍 Set up Python 3.11
+      # เปลี่ยนจาก actions/setup-python@v6 เป็น Full Commit SHA ของ v6
     - name: 🐍 Set up Python 3.11
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@916a086801933cc4852f864e493390c58a8a4f15 # [Commit SHA ล่าสุดของ actions/setup-python@v6]
       with:
         python-version: "3.11"
         
@@ -27,4 +30,3 @@ jobs: # ⬅️ รูทคีย์ 3: ชุดคำสั่งที่ต�
       run: |
         # 🎯 แก้ไข Structural Conflict: กำหนด PYTHONPATH ให้เท่ากับ Root Directory
         PYTHONPATH=. pytest --cov=.
-        
