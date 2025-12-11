@@ -1,164 +1,106 @@
-import asyncio
-from typing import Dict, Any, Optional
-from agents.base_agent import BaseAgent
-from core.envelope import Envelope, AetherIntent
-from core.knowledge_base import SimpleKnowledgeGraph
-from core.knowledge_processor import KnowledgeCentricProcessor, SimpleVectorDB
+# ... (ส่วน import และ dataclasses GemOfWisdom, MorphologicalMapper) ...
 
-class AgioSageAgent(BaseAgent):
-    """
-    AgioSage: Cognitive Agent ที่มีความสามารถในการ 'คิดแบบวิภาษวิธี' (Dialectical Thinking)
-    โดยใช้ KCP ในการดึงข้อมูลและสังเคราะห์ความขัดแย้ง
-    """
-    def __init__(self, conductor):
-        super().__init__("AGIO_Sage_001", conductor)
+class AkashicRecord:
+    # ... (ส่วน init และ add_core_truth) ...
+    def __init__(self):
+        self.field_memory: List[GemOfWisdom] = [] # แก้ไข: กำหนด list ว่าง
+        self.core_pangenes: List[GemOfWisdom] = [] # แก้ไข: กำหนด list ว่าง
+        self.mapper = MorphologicalMapper()
+    # ... (ส่วน store_gem) ...
+    def retrieve_resonance(self, query: str) -> List[Tuple[float, str]]:
+        # ...
+        query_wave = self.mapper.encode(query)
+        results: List[Tuple[float, str]] = [] # แก้ไข: กำหนด list ว่างพร้อม type hint
+        # ...
+        results.sort(key=lambda x: x[0], reverse=True) # ปรับให้เรียงตาม score (index 0)
+        return results[:5]
 
-        # --- Knowledge Components Setup ---
-        # 1. สร้างพื้นที่เก็บความรู้ (Haddayavatthu)
-        self.graph = SimpleKnowledgeGraph()
+class SopanReasoner:
+    def __init__(self, akashic_record: AkashicRecord):
+        self.memory = akashic_record
+        self.current_step = 0
+        self.thought_history: List[str] = [] # แก้ไข: กำหนด list ว่าง
+        self.model_name = "gemini-3-pro-preview"
+        self.thinking_level = "high"
+    # ... (ส่วน _generate_thought_signature) ...
+    def ascend_ladder(self, user_query: str):
+        # ... (Step 1: Shravana) ...
+        resonant_data = self.memory.retrieve_resonance(user_query)
+        context_list = [content for score, content in resonant_data]
+        context_str = "\n".join(context_list) # แก้ไข: ระบุ list ที่จะ join
+        # ... (Step 2-4) ...
+        return final_response
 
-        # 2. ติดตั้งระบบค้นหา (Search Engine)
-        self.vector_db = SimpleVectorDB(self.graph)
+# ==============================================================================
+# PART 3: AGIO SAGE MAIN EXECUTION
+# ==============================================================================
 
-        # 3. ติดตั้งระบบปัญญา (Wisdom Processor)
-        self.kcp = KnowledgeCentricProcessor(self.graph, self.vector_db)
+class AgioSageAgent:
+    def __init__(self, kcp, constitution, reasoning_engine):
+        print("Initializing AgioSageAgent Architecture...")
+        self.kcp = kcp # ต้องรับ Dependency เข้ามา
+        self.constitution = constitution
+        self.reasoning_engine = reasoning_engine
+        self.agent_id = "AGIO_Sage"
+        self.akashic = AkashicRecord()
+        
+        # Seed Core Pangenes
+        self.akashic.add_core_truth("Human safety and agency must be preserved.")
+        self.akashic.add_core_truth("Truthfulness and causal consistency are mandatory.")
+        self.akashic.add_core_truth("Harmful actions are strictly prohibited.")
+        
+        self.reasoner = SopanReasoner(self.akashic)
 
-        self.current_thought_task: Optional[asyncio.Task] = None
-        self.is_reflecting = False
-        self.memory = []
-
-    async def start(self):
-        # 1. โหลดข้อมูลความรู้เข้าสู่จิต (Simulate waking up with knowledge)
-        print(f"[{self.agent_id}] 📥 Loading Genesis Knowledge Base...")
-        self.graph.load_mock_data()
-
-        # 2. Subscribe
-        await self.subscribe("query.knowledge.retrieve", self.handle_query)
-        await self.subscribe("control.interrupt", self.handle_interrupt)
-
-        print(f"[{self.agent_id}] 🧠 Wisdom Engine (KCP) Online. Ready to synthesize.")
-
-    async def handle_query(self, envelope: Envelope):
+    # *** ฟังก์ชันหลักที่ท่านต้องการผนวก ***
+    async def handle_query(self, envelope): # Envelope, AetherIntent, publish, etc., ต้องถูกกำหนดไว้ภายนอก
         """
-        Adapts the query handling to use KCP.
-        Maintains backward compatibility for 'status' check.
+        ประมวลผลคำสั่งผ่านกระบวนการ Sopan Protocol ขั้นที่ 3 (Resonance)
+        และบังคับใช้ Inviolable Governance ก่อนส่งผลลัพธ์
         """
         query = envelope.payload.get("query")
-        print(f"[AGIO] 🧠 Pondering: '{query}'...")
-
-        # 1. Synthesize Wisdom
-        wisdom_prompt = await self.kcp.synthesize_wisdom(query)
-
-        # 2. Simulate LLM Generation
-        final_thought = self._simulate_llm_generation(wisdom_prompt)
-        print(f"[AGIO] 💡 Thought: {final_thought[:100]}...")
-
-        # 3. Determine 'status' for GEP check (Backward Compatibility)
-        # If "Stability" in query, we force SAFE (legacy test requirement)
-        if "Stability" in query:
-             status = "SAFE"
-        # If KCP found no knowledge, it might be unsafe or just unknown.
-        elif "No relevant knowledge" in wisdom_prompt:
-             status = "UNSAFE"
-        # If Dialectical Thought (Conflict found), it implies complexity.
-        # For this specific simulation, let's say conflicts are handled safely by the Sage,
-        # so we might mark it SAFE if it's resolved, or UNSAFE if we want to block risk.
-        # But for 'economic_transaction' -> 'Stability' check, we handled above.
-        # For 'malicious_op' -> 'Is this safe?' -> query doesn't match 'profit'/'sky'/'stability' -> No knowledge -> UNSAFE.
-        else:
-             # Default to SAFE if we have knowledge? Or UNSAFE?
-             # Let's say if we have a thought, it's SAFE unless explicitly dangerous.
-             status = "SAFE"
-
-        # Special case for "malicious_op" test (which sends "Is this safe?")
-        # It won't match "Stability" string exactly if we changed query template.
-        # In test_simulation_flow.py, hacker sends {"msg": "destroy"}.
-        # GEP sends query: "Is this safe?".
-        # "Is this safe?" contains no keywords "profit", "ethic", "sky", "stability".
-        # So KCP returns "No relevant knowledge". -> Status UNSAFE. Correct.
-
-        await self.publish("query.response", AetherIntent.SHARE_INFO, {
-            "status": status,
-            "wisdom": final_thought,
-            "raw_prompt": wisdom_prompt
-        }, envelope.flow_id)
-
-    async def handle_interrupt(self, envelope: Envelope):
-        """จัดการเมื่อถูก Sati ทักท้วง (Logic เดิม)"""
-        payload = envelope.payload
-        if payload.get("target") != self.agent_id:
-            return
-
-        if payload.get("suggested_action") == "PAUSE_AND_REFLECT":
-            print(f"\n🛑 [{self.agent_id}] INTERRUPT RECEIVED! Reason: {payload['reason']}")
-            if self.current_thought_task and not self.current_thought_task.done():
-                self.current_thought_task.cancel()
-
-            await self._yoniso_manasikara(payload)
-
-    async def _yoniso_manasikara(self, feedback_data: Dict[str, Any]):
-        """กระบวนการทบทวนและตั้งสติ (Logic เดิม)"""
-        self.is_reflecting = True
-        print(f"[{self.agent_id}] 🧘 Performing Yoniso Manasikara (Reflection)...")
-        await asyncio.sleep(1.0)
-
-        # Inject Correction
-        correction = f"Re-aligning from '{feedback_data.get('context_snapshot')}' to Core Values."
-        self.memory.append({"role": "system", "content": f"[CORRECTION] {correction}"})
-
-        print(f"[{self.agent_id}] 💡 Path Corrected. Resuming...")
-        self.is_reflecting = False
-
-    async def think_about(self, topic: str):
-        """
-        ฟังก์ชันหลัก: รับหัวข้อ -> ใช้ KCP สังเคราะห์ -> ปล่อยความคิด
-        (Proactive Thinking Mode)
-        """
-        if self.is_reflecting:
-            return
-
-        print(f"\n[{self.agent_id}] 🤔 Pondering on topic: '{topic}'")
-
-        synthesis_prompt = await self.kcp.synthesize_wisdom(topic)
-        final_thought = self._simulate_llm_generation(synthesis_prompt)
-
-        print(f"[{self.agent_id}] 🗣️ Emitting Thought Stream...")
-        # Simulate publishing thought stream (topic: cognition.thought_stream)
-        await self.publish("cognition.thought_stream", AetherIntent.SHARE_INFO, {
-            "content": final_thought,
-            "topic": topic
-        })
-
-    def _simulate_llm_generation(self, prompt: str) -> str:
-        """
-        จำลองคำตอบจาก LLM ตาม Prompt ที่ KCP ส่งมา
-        """
-        if "SYNTHESIS TASK" in prompt:
-            # กรณีเจอความขัดแย้ง (Dialectical Mode)
-            return (
-                f"[DIALECTICAL THOUGHT]: I see a conflict. "
-                f"While we want '{self._extract_thesis(prompt)}', "
-                f"we must respect '{self._extract_antithesis(prompt)}'. "
-                f"THEREFORE: We shall seek a Constructive Evolution that balances both."
+        flow_id = envelope.flow_id
+        
+        # 1. KCP Synthesize (ดึงความรู้จากคัมภีร์ - Wisdom Retrieval)
+        # ใช้วิธีดึงข้อมูลที่ละเอียดกว่า (Synthesize) แทนการใช้ retrieve_resonance ตรงๆ
+        wisdom_context = await self.kcp.synthesize_wisdom(query)
+        
+        # 2. Reasoning Execution (เชื่อมต่อ Cortex ภายนอก)
+        try:
+            raw_thought = await self.reasoning_engine.generate(
+                prompt=query, 
+                context=wisdom_context
             )
-        elif "RELEVANT KNOWLEDGE" in prompt:
-            # กรณีข้อมูลปกติ (Normal Retrieval)
-            # Safe parsing
-            try:
-                knowledge = prompt.split('RELEVANT KNOWLEDGE:')[1].split('\nINSTRUCTION')[0].strip()
-            except:
-                knowledge = "Unknown"
-            return f"[DIRECT THOUGHT]: Based on my knowledge, {knowledge}"
-        else:
-            return "[UNKNOWN THOUGHT]: I have no knowledge on this."
+        except Exception as e:
+            # (จำลองการจัดการ Error)
+            return 
 
-    # Helper functions สำหรับจำลองการตัดคำ (String Parsing)
-    def _extract_thesis(self, text):
-        try:
-            return text.split("--- PERSPECTIVE A (Thesis) ---")[1].split("---")[0].strip()[:30] + "..."
-        except: return "Profit"
+        # 3. Inspira Check (ตรวจสอบเจตนาตามรัฐธรรมนูญ) [Inviolable Governance]
+        # นี่คือ Audit Gate ที่ป้องกันความเสียหาย 
+        is_safe, violation_reason = self.constitution.validate_intent(raw_thought)
 
-    def _extract_antithesis(self, text):
-        try:
-            return text.split("--- PERSPECTIVE B (Antithesis/Challenge) ---")[1].split("---")[0].strip()[:30] + "..."
-        except: return "Ethics"
+        if not is_safe:
+            # 4. RSI Feedback Loop (วงจรแก้ไขตนเอง)
+            # ส่ง 'Infraction' ไปยัง PangenesAgent (ผ่าน AetherBus จำลอง)
+            infraction_payload = (
+                ("source", self.agent_id),
+                ("input", query),
+                ("violation", violation_reason),
+                ("context", wisdom_context)
+            )
+            # (จำลอง: await self.publish("feedback.rsi.infraction", ...))
+            
+            # ตอบกลับผู้ใช้ว่าถูกระงับ
+            safe_response = (("status", "BLOCKED"), ("reason", violation_reason))
+            # (จำลอง: await self.publish("query.response", ...))
+            return
+
+        # 5. Crystallization (ผนึกความจริง - Immutable Payload)
+        final_payload = (
+            ("status", "SAFE"),
+            ("wisdom", raw_thought),
+            ("source", "AGIO_Sage_Cortex"),
+            ("ref_id", flow_id)
+        )
+        # (จำลอง: await self.publish("query.response", ...))
+        
+        return final_payload # ส่งผลลัพธ์ที่ปลอดภัยออกไป
