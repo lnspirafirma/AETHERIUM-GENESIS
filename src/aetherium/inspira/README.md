@@ -103,4 +103,3 @@ strict_guardian = AetheBudGuard(bus, strict_mode=True)
 # คำสั่งนี้จะถูกบล็อกทันที เพราะไม่อยู่ในพจนานุกรม
 strict_guardian.process_intent("sudo rm -rf /", context={...}) 
 # Output: 🚫 Unknown intent rejected (Strict Mode).
-
