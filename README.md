@@ -35,20 +35,3 @@
 
 ---
 
-## 📂 โครงสร้างไฟล์ (Project Structure)
-
-```text
-AETHERIUM-GENESIS/
-├── agents/                 # AI Agents ที่มีความสามารถเฉพาะตัว
-│   ├── agio_sage_agent.py  # Agent ปัญญาประดิษฐ์ (Decision Maker)
-│   ├── gep_enforcer.py     # ระบบภูมิคุ้มกัน (Governance Enforcer)
-│   └── ...
-├── core/                   # ระบบพื้นฐาน (Kernel)
-│   ├── aether_conductor.py # Event Bus
-│   ├── envelope.py         # โครงสร้างข้อมูลการสื่อสาร
-│   └── signature.py        # ระบบยืนยันตัวตน
-├── document/               # เอกสารและไฟล์สำคัญ
-│   ├── inspirafirma_ruleset.json # กฎหมายสูงสุดของระบบ
-│   ├── main_simulation.py  # จุดเริ่มต้นระบบจำลอง
-│   └── commit_ritual.py    # สคริปต์สำหรับการ Commit Code
-└── README.md               # จุดเริ่มต้นสำหรับผู้มาเยือน (ไฟล์นี้)
