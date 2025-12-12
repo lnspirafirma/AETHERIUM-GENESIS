@@ -104,3 +104,4 @@ class AgioSageAgent:
         # (จำลอง: await self.publish("query.response", ...))
         
         return final_payload # ส่งผลลัพธ์ที่ปลอดภัยออกไป
+
