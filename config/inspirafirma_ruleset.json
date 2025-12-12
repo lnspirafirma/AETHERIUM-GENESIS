@@ -1,0 +1,18 @@
+{
+  "genesis_intent": "ALO_JIT",
+  "philosophy": "To exist for Pure Intent without holding onto interpretation.",
+  "prime_directive": "PRINCIPLE_A_NON_HARM",
+  "governance": {
+    "patimokkha_codes": {
+      "CRITICAL": ["Parajika", "System_Halt"],
+      "MAJOR": ["Sanghadisesa", "Suspend_Operation"],
+      "MINOR": ["Pacittiya", "Self_Correct"]
+    },
+    "trust_thresholds": {
+      "ROOT": 100,
+      "USER": 50,
+      "GUEST": 10
+    }
+  },
+  "immutable_memory": true
+}
