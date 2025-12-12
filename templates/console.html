@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHERIUM ARC | Resonance Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .pulse-circle {
+            box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+            animation: pulse-purple 2s infinite;
+        }
+        @keyframes pulse-purple {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); }
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+
+    <nav class="h-16 glass-panel border-b-0 border-white/10 flex items-center justify-between px-6 z-20">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-purple-400 text-3xl">all_inclusive</span>
+            <div>
+                <h1 class="text-lg font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">AETHERIUM GENESIS</h1>
+                <p class="text-xs text-gray-400 font-mono">ARC CONSOLE v1.0 [CONNECTED]</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span class="text-xs text-green-400 font-mono">SYSTEM ONLINE</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex gap-6 p-6 overflow-hidden">
+        
+        <div class="w-1/3 flex flex-col gap-6">
+            
+            <div class="glass-panel rounded-2xl p-6 flex-1 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <span class="material-symbols-outlined text-9xl">psychology</span>
+                </div>
+                <h2 class="text-sm font-bold text-gray-400 mb-4 font-mono uppercase">Mind State (สภาวะจิต)</h2>
+                
+                <div class="flex flex-col items-center justify-center h-48">
+                    <div class="w-32 h-32 rounded-full border-4 border-purple-500/30 flex items-center justify-center pulse-circle relative">
+                        <span class="text-3xl font-bold text-white" id="sati-display">85%</span>
+                        <span class="absolute -bottom-8 text-sm text-purple-300">SATI LEVEL</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-4">
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Current Mood</span>
+                        <span class="text-cyan-300 font-mono" id="mood-display">Loading...</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                        <span class="text-gray-400">Active Agents</span>
+                        <div class="flex gap-1" id="agent-badges">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 h-auto">
+                <h2 class="text-sm font-bold text-gray-400 mb-2 font-mono uppercase">Inject Intent (สร้างเจตจำนง)</h2>
+                <textarea id="intentInput" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-purple-500 transition h-24 resize-none mb-3" placeholder="ระบุคำสั่งหรือปรัชญาที่ต้องการถ่ายทอด..."></textarea>
+                <div class="flex justify-end">
+                    <button onclick="sendIntent()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-purple-900/20">
+                        <span class="material-symbols-outlined text-sm">send</span> TRANSMIT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-2/3 glass-panel rounded-2xl p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-bold text-gray-400 font-mono uppercase">Akashic Stream (กระแสความจริง)</h2>
+                <span class="text-xs bg-slate-800 px-2 py-1 rounded text-gray-500">LIVE</span>
+            </div>
+            
+            <div id="log-container" class="flex-1 overflow-y-auto font-mono text-xs space-y-2 pr-2">
+                <div class="p-3 rounded bg-slate-800/50 border-l-2 border-gray-500 text-gray-400">
+                    <span class="opacity-50">[SYSTEM]</span> Waiting for AetherBus signals...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ws = new WebSocket(`ws://${window.location.host}/ws`);
+        const logContainer = document.getElementById('log-container');
+
+        ws.onmessage = function(event) {
+            const msg = JSON.parse(event.data);
+            
+            if (msg.type === 'STATE') {
+                updateState(msg.data);
+            } else if (msg.type === 'LOG') {
+                addLog(msg);
+            }
+        };
+
+        function updateState(data) {
+            document.getElementById('sati-display').innerText = (data.sati_level * 100).toFixed(0) + '%';
+            document.getElementById('mood-display').innerText = data.current_mood;
+            
+            const badges = document.getElementById('agent-badges');
+            badges.innerHTML = data.active_agents.map(a => 
+                `<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] border border-blue-500/30">${a}</span>`
+            ).join('');
+        }
+
+        function addLog(log) {
+            const div = document.createElement('div');
+            // Check intent/sender to color code
+            let borderColor = 'border-gray-500';
+            let textColor = 'text-gray-300';
+            
+            if (log.sender.includes('GEP')) { borderColor = 'border-red-500'; textColor = 'text-red-200'; }
+            if (log.sender.includes('Agio')) { borderColor = 'border-purple-500'; textColor = 'text-purple-200'; }
+            if (log.intent === 'REQUEST_ACTION') { borderColor = 'border-yellow-500'; }
+
+            div.className = `p-3 rounded bg-slate-800/40 border-l-2 ${borderColor} ${textColor} animate-in fade-in slide-in-from-bottom-2 duration-300`;
+            div.innerHTML = `
+                <div class="flex justify-between opacity-50 mb-1">
+                    <span>[${log.timestamp}] ${log.sender}</span>
+                    <span>${log.intent}</span>
+                </div>
+                <div>${log.payload}</div>
+            `;
+            
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        async function sendIntent() {
+            const input = document.getElementById('intentInput');
+            const intent = input.value;
+            if (!intent) return;
+
+            // Optimistic Update
+            addLog({
+                timestamp: new Date().toLocaleTimeString(),
+                sender: 'Console (You)',
+                intent: 'INJECT_INTENT',
+                payload: intent
+            });
+
+            await fetch('/api/inject_intent', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({intent})
+            });
+
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
