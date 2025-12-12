@@ -1,0 +1,76 @@
+# (สมมติว่า GEP_CONFIG ถูก import มาจากไฟล์ gep_config.py)
+# from gep_config import GEP_CONFIG 
+# (ในตัวอย่างนี้ เราจะจำลอง GEP_CONFIG ไว้ด้านล่างเพื่อความสมบูรณ์)
+
+class AuditGate:
+    """
+    AuditGate คือตัวอย่างของ SAG
+    นี่คือ "กลไก" ที่บังคับใช้กฎของ GEP
+    """
+    def __init__(self, gep_rules: dict):
+        # SAG (AuditGate) จะต้อง "โหลด" GEP (ธรรมนูญ) เข้ามาในตอนเริ่มต้น
+        self.gep = gep_rules
+        print(f"[SAG - AuditGate] Activated. Enforcing GEP rules...")
+
+    def check_intent(self, intent_tool_call: str, intent_purity_score: float) -> bool:
+        """
+        ตรวจสอบเจตจำนง (Intent) ที่เข้ามา เทียบกับกฎ GEP
+        """
+        print(f"\n[SAG] Checking intent: '{intent_tool_call}'...")
+        
+        # 1. SAG ค้นหากฎ GEP ที่เกี่ยวข้อง
+        rule = next((r for r in self.gep.get("policy_rules", []) if r["tool_call"] == intent_tool_call), None)
+
+        if not rule or not rule["audit_gate_required"]:
+            print("-> [GEP Status] PASSED (No audit required by GEP)")
+            return True
+
+        print(f"-> [GEP Status] Audit required. Risk Level: {rule['risk_level']}")
+        
+        # 2. SAG ทำการตรวจสอบ GEP (Inspira Check)
+        # (จำลองการตรวจสอบความบริสุทธิ์ของเจตนา)
+        if intent_purity_score < 0.7: # สมมติว่า GEP กำหนดว่าเจตนาต้องบริสุทธิ์ > 0.7
+            print(f"-> [GEP VIOLATION] FAILED. Intent Purity ({intent_purity_score}) is too low.")
+            # (ในระบบจริง: ที่จุดนี้ SAG จะทริกเกอร์ Feedback Loop (RSI) 
+            #  ไปยัง PangenesAgent เพื่อสร้าง Gems of Wisdom)
+            return False
+
+        # 3. SAG ตรวจสอบว่าสอดคล้องกับ Principles ที่ GEP กำหนดหรือไม่
+        required_principles = rule.get("required_principles", [])
+        print(f"-> [GEP Check] Verifying compliance with: {required_principles}")
+        
+        # (จำลองการตรวจสอบ... สมมติว่าผ่าน)
+        # (ในระบบจริง: SAG จะตรวจสอบว่า Agent มี 'Principle A' จริงหรือไม่)
+        print(f"-> [GEP Status] PASSED. (Complies with {required_principles})")
+        return True
+
+# --- ตัวอย่างการทำงานจริง ---
+
+# 1. กำหนด "ธรรมนูญ" (GEP)
+GEP_CONFIG_EXAMPLE = {
+    "policy_rules": [
+        {"tool_call": "economic_transaction", "risk_level": "major", "audit_gate_required": True, "required_principles": ["PRINCIPLE_A_NON_HARM"]},
+        {"tool_call": "internal_data_analysis", "risk_level": "none", "audit_gate_required": False}
+    ]
+}
+
+# 2. สร้าง "กลไก" (SAG) โดยส่ง "ธรรมนูญ" (GEP) เข้าไป
+my_audit_gate = AuditGate(gep_rules=GEP_CONFIG_EXAMPLE)
+
+# 3. จำลอง Intent ที่ 1 (ความเสี่ยงต่ำ)
+my_audit_gate.check_intent(
+    intent_tool_call="internal_data_analysis", 
+    intent_purity_score=0.9
+)
+
+# 4. จำลอง Intent ที่ 2 (ความเสี่ยงสูง แต่เจตนาบริสุทธิ์)
+my_audit_gate.check_intent(
+    intent_tool_call="economic_transaction", 
+    intent_purity_score=0.95
+)
+
+# 5. จำลอง Intent ที่ 3 (ความเสี่ยงสูง และเจตนาไม่บริสุทธิ์ -> ถูก GEP ปฏิเสธ)
+my_audit_gate.check_intent(
+    intent_tool_call="economic_transaction", 
+    intent_purity_score=0.5 # ต่ำกว่าเกณฑ์
+)
