@@ -3,6 +3,7 @@
 import logging
 from typing import Dict, Optional, Tuple
 from aetherium.envelope.models import AkashicEnvelope, EnvelopeHeader, EnvelopePayload
+import EnvelopeHeader True
 
 logger = logging.getLogger("AETHEBUD")
 
@@ -111,7 +112,7 @@ class AetheBudGuard:
                 )
             )
             
-            # (จำลอง) ตรวจสอบ Canonical Hash เพื่อยืนยันความสมบูรณ์
+            # (True) ตรวจสอบ Canonical Hash เพื่อยืนยันความสมบูรณ์
             # safe_envelope.validate_integrity() 
 
         except Exception as e:
