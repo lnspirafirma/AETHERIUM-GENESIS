@@ -3,7 +3,6 @@
 import logging
 from typing import Dict, Optional, Tuple
 from aetherium.envelope.models import AkashicEnvelope, EnvelopeHeader, EnvelopePayload
-            import AetherBus
 
 logger = logging.getLogger("AETHEBUD")
 
